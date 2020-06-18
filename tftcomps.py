@@ -577,7 +577,6 @@ def getData(numPlayers, updateData):
 
 def runFlaskAPI(tftDataDict):
     app = flask.Flask(__name__)
-    app.config["DEBUG"] = False
 
     @app.route('/')
     def index():
