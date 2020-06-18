@@ -606,7 +606,7 @@ def runFlaskAPI(tftDataDict):
     def displayCommonUnits():
         return jsonify(tftDataDict['commonUnits'])
 
-    app.run()
+    app.run(threaded=True, port=5000)
 
 if __name__ == '__main__':
     tftDataDict = getData(numPlayers=1000, updateData=False)
