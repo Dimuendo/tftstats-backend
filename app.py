@@ -36,8 +36,6 @@ def displayCommonUnits():
     return jsonify(tftDataDict['commonUnits'])
 
 def getSummonerDataFromDB():
-    from dotenv import load_dotenv
-    load_dotenv()
     mongoUsername = os.getenv('MONGO_USERNAME')
     mongoPassword = os.getenv('MONGO_PASSWORD')
     mongoConnect = f'mongodb+srv://{mongoUsername}:{mongoPassword}@cluster0-vmp4h.mongodb.net/test?retryWrites=true&w=majority'
@@ -59,7 +57,7 @@ def getSummonerDataFromDB():
 
     return summoners
 
-summoners = getSummonerDataFromDB()
+# summoners = getSummonerDataFromDB()
 # tftDataDict = getData(summoners)
 tftDataDict = {
     'summoners': [],
