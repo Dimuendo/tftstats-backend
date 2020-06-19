@@ -19,7 +19,7 @@ def getItemPercentages(placementDictionary):
             'totalTop4': 0,
             'totalBottom4': 0
         }
-        commonUnits[item] = {}
+        commonUnits[str(item)] = {}
         for placementAndUnit in placementsAndUnits:
             placement = placementAndUnit['placement']
             character = placementAndUnit['character']
@@ -31,15 +31,15 @@ def getItemPercentages(placementDictionary):
             else:
                 itemStats['totalBottom4'] += 1
 
-            if character in commonUnits[item]:
-                commonUnits[item][character] += 1
+            if character in commonUnits[str(item)]:
+                commonUnits[str(item)][character] += 1
             else:
-                commonUnits[item][character] = 1
+                commonUnits[str(item)][character] = 1
         itemStats['winPercentage'] = itemStats['totalWins'] / itemStats['totalTimesPlayed']
         itemStats['top4Percentage'] = itemStats['totalTop4'] / itemStats['totalTimesPlayed']
         itemStats['bottom4Percentage'] = itemStats['totalBottom4'] / itemStats['totalTimesPlayed']
-        itemStatsDict[item] = itemStats
+        itemStatsDict[str(item)] = itemStats
     for item, units in commonUnits.items():
         unitItemCounter = Counter(units)
-        commonUnits[item] = unitItemCounter.most_common(3)
+        commonUnits[str(item)] = unitItemCounter.most_common(3)
     return {'itemStats': itemStatsDict, 'commonUnits': commonUnits}

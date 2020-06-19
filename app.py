@@ -3,6 +3,7 @@ from tftcomps import getData
 from flask import request, jsonify
 from summoner import Summoner
 import pymongo
+from dotenv import load_dotenv
 import os
 
 app = flask.Flask(__name__)
@@ -36,6 +37,7 @@ def displayCommonUnits():
     return jsonify(tftDataDict['commonUnits'])
 
 def getSummonerDataFromDB():
+    load_dotenv()
     mongoUsername = os.getenv('MONGO_USERNAME')
     mongoPassword = os.getenv('MONGO_PASSWORD')
     mongoConnect = f'mongodb+srv://{mongoUsername}:{mongoPassword}@cluster0-vmp4h.mongodb.net/test?retryWrites=true&w=majority'
@@ -57,15 +59,19 @@ def getSummonerDataFromDB():
 
     return summoners
 
-summoners = getSummonerDataFromDB()
-# tftDataDict = getData(summoners)
-tftDataDict = {
-    'summoners': [],
-    'compStats': [],
-    'placementDict': [],
-    'itemPercentages': [],
-    'unitPercentages': [],
-    'traitPercentages': [],
-    'commonItems': [],
-    'commonUnits': [],
-}
+def getDataFromDB():
+    load_dotenv()
+    mongoUsername = os.getenv('MONGO_USERNAME')
+    mongoPassword = os.getenv('MONGO_PASSWORD')
+    mongoConnect = f'mongodb+srv://{mongoUsername}:{mongoPassword}@cluster0-vmp4h.mongodb.net/test?retryWrites=true&w=majority'
+    client = pymongo.MongoClient(mongoConnect)
+
+    db = client['tftstats_db']
+    collection = db['tftstats']
+    cursor = collection.find({})
+    for document in cursor:
+        tftDataDict = document
+    return tftDataDict
+
+# summoners = getSummonerDataFromDB()
+tftDataDict = getDataFromDB()

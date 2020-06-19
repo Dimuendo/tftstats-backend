@@ -1,5 +1,6 @@
 import json
 import os
+import pymongo
 from summoner import Summoner
 from dotenv import load_dotenv
 from Calculations.comp_percentages import getCompStats
@@ -120,12 +121,42 @@ def getData(summoners):
     #     file.write(json.dumps(commonItems, indent=4))
 
     return {
-        'summoners': summoners,
         'compStats': top10CompStats,
-        'placementDict': placementDict,
         'itemPercentages': itemPercentages,
         'unitPercentages': unitPercentages,
         'traitPercentages': traitPercentages['total'],
         'commonItems': commonItems,
         'commonUnits': commonUnits,
     }
+
+# def getSummonerDataFromDB():
+#     load_dotenv()
+#     mongoUsername = os.getenv('MONGO_USERNAME')
+#     mongoPassword = os.getenv('MONGO_PASSWORD')
+#     mongoConnect = f'mongodb+srv://{mongoUsername}:{mongoPassword}@cluster0-vmp4h.mongodb.net/test?retryWrites=true&w=majority'
+#     client = pymongo.MongoClient(mongoConnect)
+
+#     db = client['summoner_db']
+#     collection = db['summoners']
+
+#     # Get summoners using database
+#     summoners = []
+#     cursor = collection.find({})
+#     for document in cursor:
+#         accountInfo = document['accountInfo']
+#         matchIdList = document['matchIdList']
+#         matchInfoList = document['matchInfoList']
+#         unitsAndTraitsList = document['unitsAndTraitsList']
+#         summoner = Summoner(None, accountInfo, matchIdList, matchInfoList, unitsAndTraitsList)
+#         summoners.append(summoner)
+
+#     db = client['tftstats_db']
+#     collection = db['tftstats']
+#     data = getData(summoners)
+#     with open('test.txt', 'w') as file:
+#         file.write(json.dumps(data, indent=4))
+#     dataInsertion = collection.insert_one(data)
+
+#     return summoners
+
+# summoners = getSummonerDataFromDB()
