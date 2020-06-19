@@ -3,6 +3,7 @@ from RiotAPI.riot_api_helpers import requestRiotAPI
 import os
 from dotenv import load_dotenv
 import pymongo
+from tftcomps import getData
 
 def getTopPlayers(numPlayers):
     load_dotenv()
@@ -62,40 +63,91 @@ def getTopPlayers(numPlayers):
 
     return topPlayers
 
-# Get the top n players
-numPlayers = 1000
-topPlayers = getTopPlayers(numPlayers)
-# with open('top_200.txt', 'w') as file:
-#     file.write(json.dumps(topPlayers, indent=4))
+def putSummonersInDB():
+    # Get the top n players
+    numPlayers = 1000
+    topPlayers = getTopPlayers(numPlayers)
 
-# Get summoners by requesting Riot API
-count = 1
-summoners = []
-for player in topPlayers:
-    summoner = Summoner(player['summonerName'])
-    summoners.append(summoner)
-    print(f'Summoners: {count}/{len(topPlayers)}')
-    count += 1
+    # Get summoners by requesting Riot API
+    count = 1
+    summoners = []
+    for player in topPlayers:
+        try:
+            summoner = Summoner(player['summonerName'])
+        except:
+            continue
+        summoners.append(summoner)
+        print(f'Summoners: {count}/{len(topPlayers)}')
+        count += 1
 
-# Connect to the MongoDB database
-load_dotenv()
-mongoUsername = os.getenv('MONGO_USERNAME')
-mongoPassword = os.getenv('MONGO_PASSWORD')
-mongoConnect = f'mongodb+srv://{mongoUsername}:{mongoPassword}@cluster0-vmp4h.mongodb.net/test?retryWrites=true&w=majority'
-client = pymongo.MongoClient(mongoConnect)
+    # Connect to the MongoDB database
+    load_dotenv()
+    mongoUsername = os.getenv('MONGO_USERNAME')
+    mongoPassword = os.getenv('MONGO_PASSWORD')
+    mongoConnect = f'mongodb+srv://{mongoUsername}:{mongoPassword}@cluster0-vmp4h.mongodb.net/test?retryWrites=true&w=majority'
+    client = pymongo.MongoClient(mongoConnect)
 
-db = client['summoner_db']
-collection = db['summoners']
+    db = client['summoner_db']
+    oldCollection = db['summoners']
+    oldCollection.drop()
+    collection = db['summoners']
 
-# Put summoners in database
-summonerNameDict = {}
-for summoner in summoners:
-    summonerName = summoner.accountInfo['name']
-    summonerCollection = {
-        '_id': summonerName,
-        'accountInfo': summoner.accountInfo,
-        'matchIdList': summoner.matchIdList,
-        'matchInfoList': summoner.matchInfoList,
-        'unitsAndTraitsList': summoner.unitsAndTraitsList
-    }
-    summonerInsertion = collection.insert_one(summonerCollection)
+    # Put summoners in database
+    for summoner in summoners:
+        summonerName = summoner.accountInfo['name']
+        summonerCollection = {
+            '_id': summonerName,
+            'accountInfo': summoner.accountInfo,
+            'matchIdList': summoner.matchIdList,
+            'matchInfoList': summoner.matchInfoList,
+            'unitsAndTraitsList': summoner.unitsAndTraitsList
+        }
+        summonerInsertion = collection.insert_one(summonerCollection)
+
+def getSummonerDataFromDB():
+    load_dotenv()
+    mongoUsername = os.getenv('MONGO_USERNAME')
+    mongoPassword = os.getenv('MONGO_PASSWORD')
+    mongoConnect = f'mongodb+srv://{mongoUsername}:{mongoPassword}@cluster0-vmp4h.mongodb.net/test?retryWrites=true&w=majority'
+    client = pymongo.MongoClient(mongoConnect)
+
+    db = client['summoner_db']
+    collection = db['summoners']
+
+    # Get summoners using database
+    summoners = []
+    cursor = collection.find({})
+    for document in cursor:
+        accountInfo = document['accountInfo']
+        matchIdList = document['matchIdList']
+        matchInfoList = document['matchInfoList']
+        unitsAndTraitsList = document['unitsAndTraitsList']
+        summoner = Summoner(None, accountInfo, matchIdList, matchInfoList, unitsAndTraitsList)
+        summoners.append(summoner)
+
+    return summoners
+
+def putStatsInDB():
+    summoners = getSummonerDataFromDB()
+
+    # Get the stats for the summoners in the database
+    print('Calculating data')
+    data = getData(summoners)
+
+    # Connect to the MongoDB database
+    load_dotenv()
+    mongoUsername = os.getenv('MONGO_USERNAME')
+    mongoPassword = os.getenv('MONGO_PASSWORD')
+    mongoConnect = f'mongodb+srv://{mongoUsername}:{mongoPassword}@cluster0-vmp4h.mongodb.net/test?retryWrites=true&w=majority'
+    client = pymongo.MongoClient(mongoConnect)
+
+    db = client['summoner_db']
+    collection = db['summoners']
+
+    # Put the stats data in the database
+    print('Putting stats in database')
+    db = client['tftstats_db']
+    oldCollection = db['tftstats']
+    oldCollection.drop()
+    collection = db['tftstats']
+    dataInsertion = collection.insert_one(data) 

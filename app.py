@@ -38,6 +38,11 @@ def displayCommonItems():
 def displayCommonUnits():
     return jsonify(tftDataDict['commonUnits'])
 
+@app.route('/updateData')
+def updateData():
+    global tftDataDict
+    tftDataDict = getDataFromDB()
+
 def getSummonerDataFromDB():
     load_dotenv()
     mongoUsername = os.getenv('MONGO_USERNAME')
