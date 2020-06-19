@@ -57,7 +57,7 @@ def getSummonerDataFromDB():
 
     return summoners
 
-# summoners = getSummonerDataFromDB()
+summoners = getSummonerDataFromDB()
 # tftDataDict = getData(summoners)
 tftDataDict = {
     'summoners': [],
