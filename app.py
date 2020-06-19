@@ -4,9 +4,11 @@ from flask import request, jsonify
 from summoner import Summoner
 import pymongo
 from dotenv import load_dotenv
+from flask_cors import CORS
 import os
 
 app = flask.Flask(__name__)
+CORS(app)
 
 @app.route('/')
 def index():
@@ -73,5 +75,4 @@ def getDataFromDB():
         tftDataDict = document
     return tftDataDict
 
-# summoners = getSummonerDataFromDB()
 tftDataDict = getDataFromDB()
