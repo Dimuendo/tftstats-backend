@@ -60,5 +60,15 @@ def getSummonerDataFromDB():
     return summoners
 
 summoners = getSummonerDataFromDB()
-tftDataDict = getData(summoners)
+# tftDataDict = getData(summoners)
+tftDataDict = {
+    'summoners': [],
+    'compStats': [],
+    'placementDict': [],
+    'itemPercentages': [],
+    'unitPercentages': [],
+    'traitPercentages': [],
+    'commonItems': [],
+    'commonUnits': [],
+}
 app.run(threaded=True, port=5000)
