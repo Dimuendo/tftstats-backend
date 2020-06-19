@@ -69,4 +69,3 @@ tftDataDict = {
     'commonItems': [],
     'commonUnits': [],
 }
-app.run(threaded=True)
