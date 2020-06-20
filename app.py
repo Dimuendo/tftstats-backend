@@ -38,6 +38,18 @@ def displayCommonItems():
 def displayCommonUnits():
     return jsonify(tftDataDict['commonUnits'])
 
+@app.route('/unitStats', methods=['GET'])
+def displayUnitStats():
+    unitPercentages = tftDataDict['unitPercentages']
+    commonItems = tftDataDict['commonItems']
+    return jsonify({'unitPercentages': unitPercentages, 'commonItems': commonItems})
+
+@app.route('/itemStats', methods=['GET'])
+def displayitemStats():
+    itemPercentages = tftDataDict['itemPercentages']
+    commonUnits = tftDataDict['commonUnits']
+    return jsonify({'itemPercentages': itemPercentages, 'commonUnits': commonUnits})
+
 @app.route('/updateData')
 def updateData():
     global tftDataDict
